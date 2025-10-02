@@ -1,0 +1,1718 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RemoteVM - سیستم مانیتورینگ چند دوربین</title>
+    
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #1e40af;
+            --dark-bg: #0f172a;
+            --card-bg: #1e293b;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border-color: #334155;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #06b6d4;
+            --purple: #8b5cf6;
+        }
+
+        body {
+            font-family: 'Tahoma', 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Header Styles */
+        .header {
+            background: var(--card-bg);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo i {
+            font-size: 2rem;
+            color: var(--primary-color);
+        }
+
+        .logo h1 {
+            font-size: 1.5rem;
+            color: var(--text-primary);
+        }
+
+        /* Control Panel */
+        .control-panel {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background: #475569;
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-warning {
+            background: var(--warning);
+            color: white;
+        }
+
+        .btn-info {
+            background: var(--info);
+            color: white;
+        }
+
+        .btn-purple {
+            background: var(--purple);
+            color: white;
+        }
+
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.8rem;
+        }
+
+        .btn-lg {
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+        }
+
+        /* Layout Selector */
+        .layout-selector {
+            display: flex;
+            gap: 0.5rem;
+            background: var(--dark-bg);
+            padding: 0.25rem;
+            border-radius: 8px;
+        }
+
+        .layout-btn {
+            padding: 0.5rem 1rem;
+            background: transparent;
+            color: var(--text-secondary);
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .layout-btn.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .layout-btn:hover {
+            background: var(--border-color);
+            color: white;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        /* Info Box */
+        .info-box {
+            background: var(--card-bg);
+            border: 1px solid var(--primary-color);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .info-box h3 {
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .info-box p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .info-box code {
+            background: var(--dark-bg);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-family: monospace;
+            color: var(--success);
+        }
+
+        /* Camera Grid */
+        .camera-grid {
+            display: grid;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            transition: all 0.3s;
+        }
+
+        .grid-1x1 {
+            grid-template-columns: 1fr;
+        }
+
+        .grid-2x2 {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .grid-3x3 {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .grid-4x4 {
+            grid-template-columns: repeat(4, 1fr);
+        }
+
+        /* Camera Card */
+        .camera-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+            aspect-ratio: 16/9;
+            border: 2px solid var(--border-color);
+            transition: all 0.3s;
+        }
+
+        .camera-card:hover {
+            border-color: var(--primary-color);
+        }
+
+        .camera-card.fullscreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1000;
+            border-radius: 0;
+            aspect-ratio: auto;
+        }
+
+        .camera-header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
+            padding: 0.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .camera-name {
+            color: white;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .camera-status {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--danger);
+        }
+
+        .camera-status.active {
+            background: var(--success);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+            }
+        }
+
+        .camera-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .control-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 6px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            font-size: 0.8rem;
+        }
+
+        .control-btn:hover {
+            background: rgba(255,255,255,0.2);
+            transform: scale(1.1);
+        }
+
+        .camera-content {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            background: #000;
+        }
+
+        .camera-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .camera-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            padding: 1rem;
+        }
+
+        .camera-placeholder i {
+            font-size: 3rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .camera-url-display {
+            background: var(--dark-bg);
+            padding: 0.5rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            word-break: break-all;
+            margin-top: 0.5rem;
+            font-family: monospace;
+            max-width: 90%;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 700px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            color: var(--text-primary);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* Mode Toggle */
+        .mode-toggle {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            background: var(--dark-bg);
+            padding: 0.25rem;
+            border-radius: 8px;
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 0.75rem;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .mode-btn.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .mode-btn:hover {
+            background: var(--border-color);
+            color: white;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .form-input, .form-textarea {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--dark-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            font-family: inherit;
+        }
+
+        .form-textarea {
+            min-height: 60px;
+            resize: vertical;
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+
+        .form-input:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .help-text {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+
+        /* Simple Mode Styles */
+        .simple-mode-content {
+            background: linear-gradient(135deg, var(--dark-bg), var(--card-bg));
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid var(--primary-color);
+        }
+
+        .simple-mode-header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .simple-mode-header i {
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .simple-mode-header h3 {
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .simple-mode-header p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Advanced Mode Styles */
+        .url-builder {
+            background: var(--dark-bg);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .url-builder h4 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+
+        .quick-params {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .param-chip {
+            background: var(--border-color);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .param-chip:hover {
+            background: var(--primary-color);
+        }
+
+        .param-chip.selected {
+            background: var(--primary-color);
+        }
+
+        /* URL Display Section */
+        .url-display-section {
+            background: var(--dark-bg);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .url-display-group {
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            background: var(--card-bg);
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+        }
+
+        .url-display-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .url-display-label i {
+            color: var(--primary-color);
+        }
+
+        .url-input-wrapper {
+            display: flex;
+            gap: 0.5rem;
+            align-items: stretch;
+        }
+
+        .url-input-wrapper .form-textarea {
+            flex: 1;
+            margin: 0;
+        }
+
+        .copy-btn {
+            padding: 0.5rem 1rem;
+            background: var(--success);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .copy-btn:hover {
+            background: #059669;
+            transform: scale(1.05);
+        }
+
+        .copy-btn.copied {
+            background: var(--info);
+        }
+
+        /* Simple URL Display */
+        .simple-url-display {
+            background: var(--card-bg);
+            border: 2px solid var(--primary-color);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .simple-url-item {
+            background: var(--dark-bg);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .simple-url-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .simple-url-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-primary);
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        .simple-url-content {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .simple-url-text {
+            flex: 1;
+            padding: 0.5rem;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            font-family: monospace;
+            word-break: break-all;
+        }
+
+        /* Radio Group */
+        .radio-group {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .radio-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            color: var(--text-primary);
+        }
+
+        .radio-label input[type="radio"] {
+            cursor: pointer;
+        }
+
+        /* Password Input Group */
+        .password-input-group {
+            position: relative;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 0.25rem;
+        }
+
+        .password-toggle:hover {
+            color: var(--primary-color);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .grid-3x3,
+            .grid-4x4 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .header-content {
+                justify-content: center;
+            }
+
+            .control-panel {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .url-input-wrapper {
+                flex-direction: column;
+            }
+
+            .simple-url-content {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .grid-2x2,
+            .grid-3x3,
+            .grid-4x4 {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-content {
+                padding: 1rem;
+            }
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            z-index: 3000;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <i class="fas fa-video"></i>
+                <h1>RemoteVM Monitor</h1>
+            </div>
+            
+            <div class="control-panel">
+                <div class="layout-selector">
+                    <button class="layout-btn" onclick="setLayout('1x1')">
+                        <i class="fas fa-square"></i> 1×1
+                    </button>
+                    <button class="layout-btn active" onclick="setLayout('2x2')">
+                        <i class="fas fa-th-large"></i> 2×2
+                    </button>
+                    <button class="layout-btn" onclick="setLayout('3x3')">
+                        <i class="fas fa-th"></i> 3×3
+                    </button>
+                    <button class="layout-btn" onclick="setLayout('4x4')">
+                        <i class="fas fa-grip-horizontal"></i> 4×4
+                    </button>
+                </div>
+                
+                <button class="btn btn-primary" onclick="showAddCameraModal()">
+                    <i class="fas fa-plus"></i> افزودن دوربین
+                </button>
+                
+                <button class="btn btn-secondary" onclick="refreshAllCameras()">
+                    <i class="fas fa-sync-alt"></i> بازخوانی همه
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Info Box -->
+        <div class="info-box">
+            <h3>📌 راهنمای استفاده</h3>
+            <p>1. برای ارسال تصویر از دوربین (Push): <code>https://server.remotevm.ir/?push=STREAM_ID&password=PASS</code></p>
+            <p>2. برای مشاهده تصویر (View): <code>https://server.remotevm.ir/?view=STREAM_ID&password=PASS</code></p>
+            <p>3. استفاده از پسورد برای امنیت بیشتر توصیه می‌شود</p>
+        </div>
+
+        <!-- Camera Grid -->
+        <div class="camera-grid grid-2x2" id="cameraGrid">
+            <!-- Cameras will be added here dynamically -->
+        </div>
+    </div>
+
+    <!-- Add/Edit Camera Modal -->
+    <div class="modal" id="cameraModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">افزودن دوربین جدید</h2>
+                <button class="modal-close" onclick="closeModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <!-- Mode Toggle -->
+            <div class="mode-toggle">
+                <button class="mode-btn active" onclick="setMode('simple')" id="simpleModeBtn">
+                    <i class="fas fa-user"></i> حالت ساده
+                </button>
+                <button class="mode-btn" onclick="setMode('advanced')" id="advancedModeBtn">
+                    <i class="fas fa-cog"></i> حالت پیشرفته
+                </button>
+            </div>
+            
+            <form onsubmit="saveCamera(event)">
+                <input type="hidden" id="cameraId" value="">
+                
+                <!-- Simple Mode Content -->
+                <div id="simpleMode">
+                    <div class="simple-mode-content">
+                        <div class="simple-mode-header">
+                            <i class="fas fa-video"></i>
+                            <h3>افزودن دوربین ساده و سریع</h3>
+                            <p>فقط اطلاعات اصلی را وارد کنید</p>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-tag"></i> نام دوربین
+                            </label>
+                            <input type="text" class="form-input" id="simpleCameraName" 
+                                   placeholder="مثال: دوربین ورودی">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-fingerprint"></i> شناسه استریم (Stream ID)
+                            </label>
+                            <input type="text" class="form-input" id="simpleStreamId" 
+                                   placeholder="مثال: camera001" oninput="updateSimpleUrls()">
+                            <div class="help-text">یک نام یکتا برای دوربین (فقط حروف انگلیسی و اعداد)</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-lock"></i> رمز عبور (اختیاری)
+                            </label>
+                            <div class="password-input-group">
+                                <input type="password" class="form-input" id="simplePassword" 
+                                       placeholder="رمز عبور برای امنیت بیشتر" oninput="updateSimpleUrls()">
+                                <button type="button" class="password-toggle" onclick="togglePassword('simplePassword')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <div class="help-text">برای امنیت بیشتر، رمز عبور تعیین کنید</div>
+                        </div>
+                        
+                        <!-- Simple URL Display -->
+                        <div class="simple-url-display" id="simpleUrlDisplay" style="display: none;">
+                            <div class="simple-url-item">
+                                <div class="simple-url-title">
+                                    <i class="fas fa-video" style="color: var(--danger);"></i>
+                                    لینک ارسال تصویر (Push)
+                                </div>
+                                <div class="simple-url-content">
+                                    <div class="simple-url-text" id="simplePushUrl"></div>
+                                    <button type="button" class="btn btn-success btn-sm" onclick="copyToClipboard('simplePushUrl', this)">
+                                        <i class="fas fa-copy"></i> کپی
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="simple-url-item">
+                                <div class="simple-url-title">
+                                    <i class="fas fa-eye" style="color: var(--success);"></i>
+                                    لینک مشاهده (View)
+                                </div>
+                                <div class="simple-url-content">
+                                    <div class="simple-url-text" id="simpleViewUrl"></div>
+                                    <button type="button" class="btn btn-success btn-sm" onclick="copyToClipboard('simpleViewUrl', this)">
+                                        <i class="fas fa-copy"></i> کپی
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Advanced Mode Content -->
+                <div id="advancedMode" style="display: none;">
+                    <div class="form-group">
+                        <label class="form-label">نام دوربین</label>
+                        <input type="text" class="form-input" id="advCameraName" 
+                               placeholder="مثال: دوربین ورودی">
+                    </div>
+                    
+                    <div class="url-builder">
+                        <h4>ساخت لینک پیشرفته</h4>
+                        
+                        <div class="form-group">
+                            <label class="form-label">شناسه استریم (Stream ID)</label>
+                            <input type="text" class="form-input" id="advStreamId" 
+                                   placeholder="مثال: camera001" oninput="updateAdvancedUrls()">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">رمز عبور (اختیاری)</label>
+                            <div class="password-input-group">
+                                <input type="password" class="form-input" id="advPassword" 
+                                       placeholder="رمز عبور برای امنیت بیشتر" oninput="updateAdvancedUrls()">
+                                <button type="button" class="password-toggle" onclick="togglePassword('advPassword')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="quick-params">
+                            <div class="param-chip" onclick="toggleParam(this, '&cleanoutput')">Clean Output</div>
+                            <div class="param-chip" onclick="toggleParam(this, '&autostart')">Auto Start</div>
+                            <div class="param-chip" onclick="toggleParam(this, '&muted')">Muted</div>
+                            <div class="param-chip" onclick="toggleParam(this, '&novideo=0')">With Video</div>
+                            <div class="param-chip" onclick="toggleParam(this, '&noaudio=0')">With Audio</div>
+                            <div class="param-chip" onclick="toggleParam(this, '&cleanish')">Cleanish</div>
+                            <div class="param-chip" onclick="toggleParam(this, '&bitrate=5000')">High Quality</div>
+                            <div class="param-chip" onclick="toggleParam(this, '&framerate=30')">30 FPS</div>
+                            <div class="param-chip" onclick="toggleParam(this, '&quality=2')">HD Quality</div>
+                        </div>
+                    </div>
+                    
+                    <div class="url-display-section">
+                        <h4 style="color: var(--primary-color); margin-bottom: 1rem;">
+                            <i class="fas fa-link"></i> لینک‌های تولید شده
+                        </h4>
+                        
+                        <!-- Push URL -->
+                        <div class="url-display-group">
+                            <div class="url-display-label">
+                                <i class="fas fa-video"></i>
+                                لینک ارسال تصویر (Push)
+                            </div>
+                            <div class="url-input-wrapper">
+                                <textarea class="form-textarea" id="advPushUrl" 
+                                        placeholder="لینک Push اینجا نمایش داده می‌شود..."
+                                        readonly></textarea>
+                                <button type="button" class="copy-btn" onclick="copyToClipboard('advPushUrl', this)">
+                                    <i class="fas fa-copy"></i> کپی
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- View URL -->
+                        <div class="url-display-group">
+                            <div class="url-display-label">
+                                <i class="fas fa-eye"></i>
+                                لینک مشاهده تصویر (View)
+                            </div>
+                            <div class="url-input-wrapper">
+                                <textarea class="form-textarea" id="advViewUrl" 
+                                        placeholder="لینک View اینجا نمایش داده می‌شود..."></textarea>
+                                <button type="button" class="copy-btn" onclick="copyToClipboard('advViewUrl', this)">
+                                    <i class="fas fa-copy"></i> کپی
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- URL Selection -->
+                        <div class="form-group">
+                            <label class="form-label">کدام لینک برای نمایش در دوربین استفاده شود؟</label>
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" name="urlType" value="view" checked>
+                                    <span>لینک View (مشاهده)</span>
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="urlType" value="push">
+                                    <span>لینک Push (ارسال)</span>
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="urlType" value="custom">
+                                    <span>لینک دستی</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Custom URL -->
+                        <div class="form-group" id="customUrlGroup" style="display: none;">
+                            <label class="form-label">لینک دستی</label>
+                            <textarea class="form-textarea" id="customUrl" 
+                                    placeholder="لینک دلخواه خود را وارد کنید..."></textarea>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Form Actions -->
+                <div style="display: flex; gap: 0.5rem; justify-content: space-between; flex-wrap: wrap; margin-top: 1.5rem;">
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button type="button" class="btn btn-info btn-sm" onclick="testCurrentUrls()">
+                            <i class="fas fa-external-link-alt"></i> تست لینک‌ها
+                        </button>
+                    </div>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button type="button" class="btn btn-secondary" onclick="closeModal()">
+                            انصراف
+                        </button>
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-save"></i> ذخیره دوربین
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const REMOTEVM_URL = 'https://server.remotevm.ir/';
+        let cameras = [];
+        let currentLayout = '2x2';
+        let cameraIdCounter = 0;
+        let editingCameraId = null;
+        let selectedParams = new Set();
+        let currentMode = 'simple';
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadCameras();
+            
+            // If no cameras exist, add default ones
+            if (cameras.length === 0) {
+                addDefaultCameras();
+            }
+            
+            renderCameras();
+            
+            // Add event listeners
+            document.querySelectorAll('input[name="urlType"]').forEach(radio => {
+                radio.addEventListener('change', (e) => {
+                    document.getElementById('customUrlGroup').style.display = 
+                        e.target.value === 'custom' ? 'block' : 'none';
+                });
+            });
+            
+            // Set default selected params
+            const defaultParams = ['&cleanoutput', '&autostart', '&muted'];
+            defaultParams.forEach(param => {
+                const chip = Array.from(document.querySelectorAll('.param-chip')).find(
+                    c => c.getAttribute('onclick').includes(param)
+                );
+                if (chip) {
+                    chip.classList.add('selected');
+                    selectedParams.add(param);
+                }
+            });
+        });
+
+        // Add default cameras
+        function addDefaultCameras() {
+            const defaultCameras = [
+                {
+                    id: 1,
+                    name: 'دوربین ورودی اصلی',
+                    streamId: 'entrance_main',
+                    password: 'secure123',
+                    url: `${REMOTEVM_URL}?view=entrance_main&password=secure123&cleanoutput&autostart&muted`,
+                    pushUrl: `${REMOTEVM_URL}?push=entrance_main&password=secure123&autostart`,
+                    viewUrl: `${REMOTEVM_URL}?view=entrance_main&password=secure123&cleanoutput&autostart&muted`,
+                    active: false
+                },
+                {
+                    id: 2,
+                    name: 'دوربین پارکینگ',
+                    streamId: 'parking_cam',
+                    password: 'park456',
+                    url: `${REMOTEVM_URL}?view=parking_cam&password=park456&cleanoutput&autostart&muted`,
+                    pushUrl: `${REMOTEVM_URL}?push=parking_cam&password=park456&autostart`,
+                    viewUrl: `${REMOTEVM_URL}?view=parking_cam&password=park456&cleanoutput&autostart&muted`,
+                    active: false
+                },
+                {
+                    id: 3,
+                    name: 'دوربین انبار',
+                    streamId: 'warehouse',
+                    password: '',
+                    url: `${REMOTEVM_URL}?view=warehouse&cleanoutput&autostart&muted`,
+                    pushUrl: `${REMOTEVM_URL}?push=warehouse&autostart`,
+                    viewUrl: `${REMOTEVM_URL}?view=warehouse&cleanoutput&autostart&muted`,
+                    active: false
+                },
+                {
+                    id: 4,
+                    name: 'دوربین دفتر مدیریت',
+                    streamId: 'office_mgmt',
+                    password: 'admin789',
+                    url: `${REMOTEVM_URL}?view=office_mgmt&password=admin789&cleanoutput&autostart&muted`,
+                    pushUrl: `${REMOTEVM_URL}?push=office_mgmt&password=admin789&autostart`,
+                    viewUrl: `${REMOTEVM_URL}?view=office_mgmt&password=admin789&cleanoutput&autostart&muted`,
+                    active: false
+                }
+            ];
+            
+            cameras = defaultCameras;
+            cameraIdCounter = 4;
+            saveCameras();
+        }
+
+        // Load cameras from localStorage
+        function loadCameras() {
+            const saved = localStorage.getItem('remotevm-cameras');
+            if (saved) {
+                cameras = JSON.parse(saved);
+                cameraIdCounter = cameras.length > 0 ? Math.max(...cameras.map(c => c.id)) : 0;
+            }
+        }
+
+        // Save cameras to localStorage
+        function saveCameras() {
+            localStorage.setItem('remotevm-cameras', JSON.stringify(cameras));
+        }
+
+        // Set mode (simple/advanced)
+        function setMode(mode) {
+            currentMode = mode;
+            
+            // Update buttons
+            document.getElementById('simpleModeBtn').classList.toggle('active', mode === 'simple');
+            document.getElementById('advancedModeBtn').classList.toggle('active', mode === 'advanced');
+            
+            // Show/hide content
+            document.getElementById('simpleMode').style.display = mode === 'simple' ? 'block' : 'none';
+            document.getElementById('advancedMode').style.display = mode === 'advanced' ? 'block' : 'none';
+            
+            // Sync data between modes
+            if (mode === 'advanced') {
+                document.getElementById('advCameraName').value = document.getElementById('simpleCameraName').value;
+                document.getElementById('advStreamId').value = document.getElementById('simpleStreamId').value;
+                document.getElementById('advPassword').value = document.getElementById('simplePassword').value;
+                updateAdvancedUrls();
+            } else {
+                document.getElementById('simpleCameraName').value = document.getElementById('advCameraName').value;
+                document.getElementById('simpleStreamId').value = document.getElementById('advStreamId').value;
+                document.getElementById('simplePassword').value = document.getElementById('advPassword').value;
+                updateSimpleUrls();
+            }
+        }
+
+        // Update Simple URLs
+        function updateSimpleUrls() {
+            const streamId = document.getElementById('simpleStreamId').value;
+            const password = document.getElementById('simplePassword').value;
+            
+            if (!streamId) {
+                document.getElementById('simpleUrlDisplay').style.display = 'none';
+                return;
+            }
+            
+            document.getElementById('simpleUrlDisplay').style.display = 'block';
+            
+            // Build URLs
+            let pushUrl = `${REMOTEVM_URL}?push=${streamId}`;
+            let viewUrl = `${REMOTEVM_URL}?view=${streamId}`;
+            
+            if (password) {
+                pushUrl += `&password=${password}`;
+                viewUrl += `&password=${password}`;
+            }
+            
+            pushUrl += '&autostart';
+            viewUrl += '&cleanoutput&autostart&muted';
+            
+            document.getElementById('simplePushUrl').textContent = pushUrl;
+            document.getElementById('simpleViewUrl').textContent = viewUrl;
+        }
+
+        // Update Advanced URLs
+        function updateAdvancedUrls() {
+            const streamId = document.getElementById('advStreamId').value;
+            const password = document.getElementById('advPassword').value;
+            
+            if (!streamId) {
+                document.getElementById('advPushUrl').value = '';
+                document.getElementById('advViewUrl').value = '';
+                return;
+            }
+            
+            // Build Push URL
+            let pushUrl = `${REMOTEVM_URL}?push=${streamId}`;
+            if (password) pushUrl += `&password=${password}`;
+            if (selectedParams.has('&autostart')) pushUrl += '&autostart';
+            
+            // Build View URL
+            let viewUrl = `${REMOTEVM_URL}?view=${streamId}`;
+            if (password) viewUrl += `&password=${password}`;
+            selectedParams.forEach(param => {
+                if (param !== '&autostart' || param.includes('autostart')) {
+                    viewUrl += param;
+                }
+            });
+            
+            document.getElementById('advPushUrl').value = pushUrl;
+            document.getElementById('advViewUrl').value = viewUrl;
+        }
+
+        // Toggle password visibility
+        function togglePassword(inputId) {
+            const input = document.getElementById(inputId);
+            const icon = event.target.closest('.password-toggle').querySelector('i');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
+        // Toggle parameter chip
+        function toggleParam(chip, param) {
+            chip.classList.toggle('selected');
+            
+            if (chip.classList.contains('selected')) {
+                selectedParams.add(param);
+            } else {
+                selectedParams.delete(param);
+            }
+            
+            updateAdvancedUrls();
+        }
+
+        // Render cameras in grid
+        function renderCameras() {
+            const grid = document.getElementById('cameraGrid');
+            grid.innerHTML = '';
+            
+            if (cameras.length === 0) {
+                grid.innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 3rem;">
+                        <i class="fas fa-video-slash" style="font-size: 4rem; color: var(--text-secondary); margin-bottom: 1rem; display: block;"></i>
+                        <p style="color: var(--text-secondary); margin-bottom: 1rem;">هیچ دوربینی اضافه نشده است</p>
+                        <button class="btn btn-primary" onclick="showAddCameraModal()">
+                            <i class="fas fa-plus"></i> اولین دوربین را اضافه کنید
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+            
+            cameras.forEach(camera => {
+                const cameraCard = createCameraCard(camera);
+                grid.appendChild(cameraCard);
+            });
+        }
+
+        // Create camera card element
+        function createCameraCard(camera) {
+            const card = document.createElement('div');
+            card.className = 'camera-card';
+            card.id = `camera-${camera.id}`;
+            
+            const hasPassword = camera.password ? '🔒' : '';
+            
+            card.innerHTML = `
+                <div class="camera-header">
+                    <div class="camera-name">
+                        <span class="camera-status ${camera.active ? 'active' : ''}"></span>
+                        ${camera.name} ${hasPassword}
+                    </div>
+                    <div class="camera-controls">
+                        <button class="control-btn" onclick="showCameraLinks(${camera.id})" title="نمایش لینک‌ها">
+                            <i class="fas fa-link"></i>
+                        </button>
+                        <button class="control-btn" onclick="editCamera(${camera.id})" title="ویرایش">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="control-btn" onclick="toggleFullscreen(${camera.id})" title="تمام صفحه">
+                            <i class="fas fa-expand"></i>
+                        </button>
+                        <button class="control-btn" onclick="refreshCamera(${camera.id})" title="بازخوانی">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                        <button class="control-btn" onclick="toggleCamera(${camera.id})" title="${camera.active ? 'غیرفعال' : 'فعال'}">
+                            <i class="fas fa-power-off"></i>
+                        </button>
+                        <button class="control-btn" onclick="removeCamera(${camera.id})" title="حذف" style="background: rgba(239, 68, 68, 0.2);">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="camera-content">
+                    ${camera.active ? 
+                        `<iframe class="camera-iframe" 
+                                id="iframe-${camera.id}"
+                                src="${camera.url}"
+                                allow="camera; microphone; display-capture; autoplay"
+                                allowfullscreen>
+                        </iframe>` :
+                        `<div class="camera-placeholder">
+                            <i class="fas fa-video-slash"></i>
+                            <p>دوربین غیرفعال</p>
+                            <p style="font-size: 0.8rem; color: var(--text-secondary);">Stream ID: ${camera.streamId || 'ندارد'}</p>
+                            <button class="btn btn-primary" onclick="toggleCamera(${camera.id})">
+                                فعال‌سازی
+                            </button>
+                            <div class="camera-url-display">${camera.url}</div>
+                        </div>`
+                    }
+                </div>
+            `;
+            
+            return card;
+        }
+
+        // Layout Management
+        function setLayout(layout) {
+            currentLayout = layout;
+            const grid = document.getElementById('cameraGrid');
+            
+            // Remove all layout classes
+            grid.classList.remove('grid-1x1', 'grid-2x2', 'grid-3x3', 'grid-4x4');
+            
+            // Add new layout class
+            grid.classList.add(`grid-${layout}`);
+            
+            // Update active button
+            document.querySelectorAll('.layout-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.closest('.layout-btn').classList.add('active');
+        }
+
+        // Camera Management Functions
+        function showAddCameraModal() {
+            editingCameraId = null;
+            document.getElementById('modalTitle').textContent = 'افزودن دوربین جدید';
+            document.getElementById('cameraId').value = '';
+            
+            // Reset form
+            document.getElementById('simpleCameraName').value = '';
+            document.getElementById('simpleStreamId').value = '';
+            document.getElementById('simplePassword').value = '';
+            document.getElementById('advCameraName').value = '';
+            document.getElementById('advStreamId').value = '';
+            document.getElementById('advPassword').value = '';
+            document.getElementById('advPushUrl').value = '';
+            document.getElementById('advViewUrl').value = '';
+            document.getElementById('customUrl').value = '';
+            
+            // Reset to simple mode
+            setMode('simple');
+            
+            document.getElementById('simpleUrlDisplay').style.display = 'none';
+            document.querySelector('input[name="urlType"][value="view"]').checked = true;
+            document.getElementById('customUrlGroup').style.display = 'none';
+            
+            document.getElementById('cameraModal').classList.add('show');
+        }
+
+        function editCamera(id) {
+            const camera = cameras.find(c => c.id === id);
+            if (!camera) return;
+            
+            editingCameraId = id;
+            document.getElementById('modalTitle').textContent = 'ویرایش دوربین';
+            document.getElementById('cameraId').value = id;
+            
+            // Fill simple mode
+            document.getElementById('simpleCameraName').value = camera.name;
+            document.getElementById('simpleStreamId').value = camera.streamId || '';
+            document.getElementById('simplePassword').value = camera.password || '';
+            
+            // Fill advanced mode
+            document.getElementById('advCameraName').value = camera.name;
+            document.getElementById('advStreamId').value = camera.streamId || '';
+            document.getElementById('advPassword').value = camera.password || '';
+            document.getElementById('advPushUrl').value = camera.pushUrl || '';
+            document.getElementById('advViewUrl').value = camera.viewUrl || '';
+            
+            // Set appropriate mode
+            setMode('simple');
+            updateSimpleUrls();
+            
+            document.getElementById('cameraModal').classList.add('show');
+        }
+
+        function closeModal() {
+            document.getElementById('cameraModal').classList.remove('show');
+            editingCameraId = null;
+        }
+
+        function saveCamera(event) {
+            event.preventDefault();
+            
+            const id = document.getElementById('cameraId').value;
+            let name, streamId, password, pushUrl, viewUrl, url;
+            
+            if (currentMode === 'simple') {
+                name = document.getElementById('simpleCameraName').value;
+                streamId = document.getElementById('simpleStreamId').value;
+                password = document.getElementById('simplePassword').value;
+                
+                // Build URLs
+                pushUrl = `${REMOTEVM_URL}?push=${streamId}`;
+                viewUrl = `${REMOTEVM_URL}?view=${streamId}`;
+                
+                if (password) {
+                    pushUrl += `&password=${password}`;
+                    viewUrl += `&password=${password}`;
+                }
+                
+                pushUrl += '&autostart';
+                viewUrl += '&cleanoutput&autostart&muted';
+                
+                url = viewUrl; // Default to view URL
+            } else {
+                name = document.getElementById('advCameraName').value;
+                streamId = document.getElementById('advStreamId').value;
+                password = document.getElementById('advPassword').value;
+                pushUrl = document.getElementById('advPushUrl').value;
+                viewUrl = document.getElementById('advViewUrl').value;
+                
+                const urlType = document.querySelector('input[name="urlType"]:checked').value;
+                if (urlType === 'view') {
+                    url = viewUrl;
+                } else if (urlType === 'push') {
+                    url = pushUrl;
+                } else {
+                    url = document.getElementById('customUrl').value;
+                }
+            }
+            
+            if (!name || !streamId) {
+                showNotification('لطفا نام و شناسه استریم را وارد کنید', 'warning');
+                return;
+            }
+            
+            if (id) {
+                // Edit existing camera
+                const camera = cameras.find(c => c.id === parseInt(id));
+                if (camera) {
+                    camera.name = name;
+                    camera.streamId = streamId;
+                    camera.password = password;
+                    camera.url = url;
+                    camera.pushUrl = pushUrl;
+                    camera.viewUrl = viewUrl;
+                }
+            } else {
+                // Add new camera
+                const newCamera = {
+                    id: ++cameraIdCounter,
+                    name: name,
+                    streamId: streamId,
+                    password: password,
+                    url: url,
+                    pushUrl: pushUrl,
+                    viewUrl: viewUrl,
+                    active: false
+                };
+                cameras.push(newCamera);
+            }
+            
+            saveCameras();
+            renderCameras();
+            closeModal();
+            showNotification(id ? 'دوربین ویرایش شد' : 'دوربین اضافه شد', 'success');
+        }
+
+        function removeCamera(id) {
+            if (confirm('آیا از حذف این دوربین اطمینان دارید؟')) {
+                cameras = cameras.filter(c => c.id !== id);
+                saveCameras();
+                renderCameras();
+                showNotification('دوربین حذف شد', 'warning');
+            }
+        }
+
+        function toggleCamera(id) {
+            const camera = cameras.find(c => c.id === id);
+            if (camera) {
+                camera.active = !camera.active;
+                saveCameras();
+                renderCameras();
+                showNotification(camera.active ? 'دوربین فعال شد' : 'دوربین غیرفعال شد', 'info');
+            }
+        }
+
+        function refreshCamera(id) {
+            const iframe = document.getElementById(`iframe-${id}`);
+            if (iframe) {
+                const src = iframe.src;
+                iframe.src = '';
+                setTimeout(() => {
+                    iframe.src = src;
+                }, 100);
+                showNotification('دوربین بازخوانی شد', 'info');
+            }
+        }
+
+        function refreshAllCameras() {
+            cameras.forEach(camera => {
+                if (camera.active) {
+                    refreshCamera(camera.id);
+                }
+            });
+            showNotification('همه دوربین‌ها بازخوانی شدند', 'info');
+        }
+
+        function toggleFullscreen(id) {
+            const card = document.getElementById(`camera-${id}`);
+            card.classList.toggle('fullscreen');
+            
+            const icon = card.querySelector('.fa-expand, .fa-compress');
+            if (card.classList.contains('fullscreen')) {
+                icon.classList.remove('fa-expand');
+                icon.classList.add('fa-compress');
+            } else {
+                icon.classList.remove('fa-compress');
+                icon.classList.add('fa-expand');
+            }
+        }
+
+        // Show camera links
+        function showCameraLinks(id) {
+            const camera = cameras.find(c => c.id === id);
+            if (!camera) return;
+            
+            const modalContent = `
+                <div style="background: var(--card-bg); padding: 1.5rem; border-radius: 12px; max-width: 600px;">
+                    <h3 style="color: var(--primary-color); margin-bottom: 1rem;">
+                        <i class="fas fa-link"></i> لینک‌های دوربین: ${camera.name}
+                    </h3>
+                    
+                    <div style="background: var(--dark-bg); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                        <p style="color: var(--text-secondary); margin-bottom: 0.5rem;">
+                            <strong>Stream ID:</strong> ${camera.streamId || 'ندارد'}
+                        </p>
+                        <p style="color: var(--text-secondary);">
+                            <strong>رمز عبور:</strong> ${camera.password || 'ندارد'}
+                        </p>
+                    </div>
+                    
+                    <div style="margin-bottom: 1rem;">
+                        <label style="color: var(--danger); font-weight: bold; display: block; margin-bottom: 0.5rem;">
+                            <i class="fas fa-video"></i> لینک Push (ارسال):
+                        </label>
+                        <div style="background: var(--dark-bg); padding: 0.75rem; border-radius: 6px; word-break: break-all; font-family: monospace; font-size: 0.85rem; color: var(--text-primary);">
+                            ${camera.pushUrl || 'ندارد'}
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label style="color: var(--success); font-weight: bold; display: block; margin-bottom: 0.5rem;">
+                            <i class="fas fa-eye"></i> لینک View (مشاهده):
+                        </label>
+                        <div style="background: var(--dark-bg); padding: 0.75rem; border-radius: 6px; word-break: break-all; font-family: monospace; font-size: 0.85rem; color: var(--text-primary);">
+                            ${camera.viewUrl || 'ندارد'}
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Create and show modal
+            const modal = document.createElement('div');
+            modal.className = 'modal show';
+            modal.style.cursor = 'pointer';
+            modal.innerHTML = modalContent;
+            modal.onclick = () => document.body.removeChild(modal);
+            document.body.appendChild(modal);
+        }
+
+        // Test URLs
+        function testCurrentUrls() {
+            let pushUrl, viewUrl;
+            
+            if (currentMode === 'simple') {
+                pushUrl = document.getElementById('simplePushUrl').textContent;
+                viewUrl = document.getElementById('simpleViewUrl').textContent;
+            } else {
+                pushUrl = document.getElementById('advPushUrl').value;
+                viewUrl = document.getElementById('advViewUrl').value;
+            }
+            
+            if (pushUrl) window.open(pushUrl, '_blank');
+            if (viewUrl) setTimeout(() => window.open(viewUrl, '_blank'), 500);
+        }
+
+        // Copy to clipboard
+        function copyToClipboard(elementId, button) {
+            let text;
+            const element = document.getElementById(elementId);
+            
+            if (element.tagName === 'TEXTAREA' || element.tagName === 'INPUT') {
+                text = element.value;
+            } else {
+                text = element.textContent;
+            }
+            
+            if (!text) {
+                showNotification('لینکی برای کپی وجود ندارد', 'warning');
+                return;
+            }
+            
+            navigator.clipboard.writeText(text).then(() => {
+                const originalHTML = button.innerHTML;
+                button.innerHTML = '<i class="fas fa-check"></i> کپی شد';
+                button.classList.add('copied');
+                
+                setTimeout(() => {
+                    button.innerHTML = originalHTML;
+                    button.classList.remove('copied');
+                }, 2000);
+                
+                showNotification('لینک کپی شد', 'success');
+            }).catch(err => {
+                // Fallback
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                showNotification('لینک کپی شد', 'success');
+            });
+        }
+
+        // Notification System
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.style.background = 
+                type === 'success' ? 'var(--success)' : 
+                type === 'warning' ? 'var(--warning)' : 
+                type === 'danger' ? 'var(--danger)' : 
+                type === 'info' ? 'var(--info)' : 'var(--primary-color)';
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+
+        // Keyboard Shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.camera-card.fullscreen').forEach(card => {
+                    card.classList.remove('fullscreen');
+                });
+                closeModal();
+            }
+        });
+
+        // Add slideOut animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideOut {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

@@ -111,9 +111,9 @@
             width: 45px;
             height: 45px;
             position: fixed;
-            top: 1rem;
-            left: 1rem; /* Changed to left */
-            z-index: 101;
+            top: 1.8rem;
+            left: 3rem;
+            z-index: 1000; /* Increased z-index to ensure always on top */
         }
 
         .menu-toggle:hover {
@@ -1118,13 +1118,7 @@
         <div class="camera-grid grid-2x2" id="cameraGrid">
             <!-- Cameras will be added here dynamically -->
         </div>
-        <!-- Info Box -->
-        <div class="info-box">
-            <h3>📌 راهنمای استفاده</h3>
-            <p>1. شناسه استریم فقط شامل حروف انگلیسی (A-Z, a-z) و اعداد (0-9) باشد</p>
-            <p>2. برای ارسال تصویر (Push): <code>https://server.remotevm.ir/?push=STREAMID</code></p>
-            <p>3. برای مشاهده تصویر (View): <code>https://server.remotevm.ir/?view=STREAMID</code></p>
-        </div>        
+       
     </div>
 
     <!-- Add/Edit Camera Modal -->

@@ -31,8 +31,8 @@
         }
 
         body {
-            font-family: 'Tahoma', 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            font-family: 'Vazirmatn', 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, var(--dark-bg) 0%, var(--card-bg) 100%);
             color: var(--text-primary);
             min-height: 100vh;
             overflow-x: hidden;
@@ -41,12 +41,12 @@
         /* Header Styles */
         .header {
             background: var(--card-bg);
+            opacity: 0.6;
+            border-radius: 35px;
             padding: 1rem 2rem;
             box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-            position: sticky;
-            top: 0;
-            z-index: 100;
             border-bottom: 2px solid var(--border-color);
+            margin: 1rem 2rem;
         }
 
         .header-content {
@@ -55,24 +55,155 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
             gap: 1rem;
         }
 
         .logo {
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 0.75rem;
         }
 
-        .logo i {
-            font-size: 2rem;
-            color: var(--primary-color);
+        .logo img {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
         }
 
         .logo h1 {
             font-size: 1.5rem;
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        /* Status Indicator */
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--danger);
+            animation: pulse 2s infinite;
+        }
+
+        .status-indicator.active {
+            background: var(--success);
+        }
+
+        /* Menu Toggle Button */
+        .menu-toggle {
+            background: var(--primary-color);
+            border: none;
+            color: white;
+            padding: 0.75rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 45px;
+            height: 45px;
+            position: fixed;
+            top: 1rem;
+            left: 1rem; /* Changed to left */
+            z-index: 101;
+        }
+
+        .menu-toggle:hover {
+            background: var(--secondary-color);
+            transform: scale(1.05);
+        }
+
+        /* Menu Overlay */
+        .menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 199;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+
+        .menu-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Menu Panel */
+        .menu-panel {
+            position: fixed;
+            top: 0;
+            right: -320px;
+            width: 300px;
+            height: 100%;
+            background: var(--card-bg);
+            box-shadow: -2px 0 10px rgba(0,0,0,0.3);
+            z-index: 200;
+            transition: right 0.3s ease;
+            overflow-y: auto;
+        }
+
+        .menu-panel.active {
+            right: 0;
+        }
+
+        .menu-content {
+            padding: 2rem 1.5rem;
+        }
+
+        .menu-content h2 {
+            color: var(--primary-color);
+            margin-bottom: 2rem;
+            font-size: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .menu-content ul {
+            list-style: none;
+        }
+
+        .menu-content li {
+            margin-bottom: 0.5rem;
+        }
+
+        .menu-content a {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem 1rem;
             color: var(--text-primary);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s;
+            font-size: 0.95rem;
+        }
+
+        .menu-content a:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateX(-5px);
+        }
+
+        .menu-content a i {
+            width: 20px;
+            text-align: center;
+            color: var(--primary-color);
+        }
+
+        .menu-content a:hover i {
+            color: white;
         }
 
         /* Control Panel */
@@ -81,6 +212,12 @@
             gap: 1rem;
             align-items: center;
             flex-wrap: wrap;
+        }
+
+        .nav-controls {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
         }
 
         .btn {
@@ -355,7 +492,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            background: linear-gradient(135deg, var(--card-bg) 0%, var(--dark-bg) 100%);
             padding: 1rem;
         }
 
@@ -460,6 +597,88 @@
         .mode-btn:hover {
             background: var(--border-color);
             color: white;
+        }
+
+        /* Toggle Switch Styles */
+        .toggle-group {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            background: var(--dark-bg);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .toggle-label {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        .toggle-label-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .toggle-label-title {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--text-primary);
+        }
+
+        .toggle-label-desc {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 60px;
+            height: 30px;
+            background: var(--border-color);
+            border-radius: 30px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .toggle-switch.active {
+            background: var(--success);
+        }
+
+        .toggle-switch::before {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 24px;
+            height: 24px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .toggle-switch.active::before {
+            transform: translateX(30px);
+        }
+
+        .toggle-icon {
+            font-size: 1.25rem;
+            color: var(--primary-color);
+        }
+
+        /* Input Validation */
+        .form-input.invalid {
+            border-color: var(--danger);
+        }
+
+        .validation-error {
+            color: var(--danger);
+            font-size: 0.8rem;
+            margin-top: 0.25rem;
         }
 
         .form-group {
@@ -727,12 +946,13 @@
             }
 
             .header-content {
-                justify-content: center;
+                justify-content: space-between;
             }
 
             .control-panel {
                 width: 100%;
                 justify-content: center;
+                margin-top: 1rem;
             }
 
             .url-input-wrapper {
@@ -741,6 +961,15 @@
 
             .simple-url-content {
                 flex-direction: column;
+            }
+
+            .toggle-group {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .menu-panel {
+                width: 280px;
             }
         }
 
@@ -753,6 +982,14 @@
 
             .modal-content {
                 padding: 1rem;
+            }
+
+            .logo h1 {
+                font-size: 1.2rem;
+            }
+
+            .menu-panel {
+                width: 260px;
             }
         }
 
@@ -786,46 +1023,108 @@
     <!-- Header -->
     <header class="header">
         <div class="header-content">
-            <div class="logo">
-                <i class="fas fa-video"></i>
-                <h1>RemoteVM Monitor</h1>
+            <div class="logo-section">
+                <div class="logo">
+                    <img src="favicon.png" alt="RemoteVM Logo" onerror="this.style.display='none'">
+                    <h1>R.V.M</h1>
+                    <span class="status-indicator" id="statusIndicator"></span>
+                </div>
             </div>
             
-            <div class="control-panel">
-                <div class="layout-selector">
-                    <button class="layout-btn" onclick="setLayout('1x1')">
-                        <i class="fas fa-square"></i> 1×1
-                    </button>
-                    <button class="layout-btn active" onclick="setLayout('2x2')">
-                        <i class="fas fa-th-large"></i> 2×2
-                    </button>
-                    <button class="layout-btn" onclick="setLayout('3x3')">
-                        <i class="fas fa-th"></i> 3×3
-                    </button>
-                    <button class="layout-btn" onclick="setLayout('4x4')">
-                        <i class="fas fa-grip-horizontal"></i> 4×4
-                    </button>
-                </div>
-                
-                <button class="btn btn-primary" onclick="showAddCameraModal()">
-                    <i class="fas fa-plus"></i> افزودن دوربین
-                </button>
-                
-                <button class="btn btn-secondary" onclick="refreshAllCameras()">
-                    <i class="fas fa-sync-alt"></i> بازخوانی همه
+            <div class="nav-controls">
+                <button class="menu-toggle" id="menuToggle" aria-label="باز کردن منو">
+                    <i class="fas fa-bars" id="menuIcon"></i>
                 </button>
             </div>
         </div>
     </header>
 
+    <!-- Menu Overlay -->
+    <div class="menu-overlay" id="menuOverlay"></div>
+
+    <!-- Menu Panel -->
+    <nav class="menu-panel" id="menuPanel">
+        <div class="menu-content">
+            <h2>منو</h2>
+            <ul>
+                <li>
+                    <a href="https://remotevm.ir" target="_blank" rel="noopener noreferrer">
+                        <i class="fas fa-home"></i> خانه
+                    </a>
+                </li>
+                <li>
+                    <a href="./tutorial.html" target="_blank" rel="noopener noreferrer">
+                        <i class="fas fa-book"></i> راهنما
+                    </a>
+                </li>
+                <li>
+                    <a href="https://call.remotevm.ir" target="_blank" rel="noopener noreferrer">
+                        <i class="fas fa-video"></i> تماس تصویری
+                    </a>
+                </li>
+                <li>
+                    <a href="https://about.remotevm.ir" target="_blank" rel="noopener noreferrer">
+                        <i class="fas fa-info-circle"></i> درباره ما
+                    </a>
+                </li>
+                <li>
+                    <a href="https://room.remotevm.ir" target="_blank" rel="noopener noreferrer">
+                        <i class="fas fa-users-cog"></i> پنل حرفه‌ای
+                    </a>
+                </li>
+                <li>
+                    <a href="https://remotevm.ir/product" target="_blank" rel="noopener noreferrer">
+                        <i class="fas fa-box-open"></i> محصولات
+                    </a>
+                </li>
+                <li>
+                    <a href="#" onclick="showAddCameraModal(); closeMenu();">
+                        <i class="fas fa-plus-circle"></i> افزودن دوربین
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
     <!-- Main Container -->
     <div class="container">
-
+        <!-- Control Panel -->
+        <div class="control-panel">
+            <div class="layout-selector">
+                <button class="layout-btn" onclick="setLayout('1x1')">
+                    <i class="fas fa-square"></i> 1×1
+                </button>
+                <button class="layout-btn active" onclick="setLayout('2x2')">
+                    <i class="fas fa-th-large"></i> 2×2
+                </button>
+                <button class="layout-btn" onclick="setLayout('3x3')">
+                    <i class="fas fa-th"></i> 3×3
+                </button>
+                <button class="layout-btn" onclick="setLayout('4x4')">
+                    <i class="fas fa-grip-horizontal"></i> 4×4
+                </button>
+            </div>
+            
+            <button class="btn btn-primary" onclick="showAddCameraModal()">
+                <i class="fas fa-plus"></i> افزودن دوربین
+            </button>
+            
+            <button class="btn btn-secondary" onclick="refreshAllCameras()">
+                <i class="fas fa-sync-alt"></i> بازخوانی همه
+            </button>
+        </div>
 
         <!-- Camera Grid -->
         <div class="camera-grid grid-2x2" id="cameraGrid">
             <!-- Cameras will be added here dynamically -->
         </div>
+        <!-- Info Box -->
+        <div class="info-box">
+            <h3>📌 راهنمای استفاده</h3>
+            <p>1. شناسه استریم فقط شامل حروف انگلیسی (A-Z, a-z) و اعداد (0-9) باشد</p>
+            <p>2. برای ارسال تصویر (Push): <code>https://server.remotevm.ir/?push=STREAMID</code></p>
+            <p>3. برای مشاهده تصویر (View): <code>https://server.remotevm.ir/?view=STREAMID</code></p>
+        </div>        
     </div>
 
     <!-- Add/Edit Camera Modal -->
@@ -873,8 +1172,12 @@
                                 <i class="fas fa-fingerprint"></i> شناسه استریم (Stream ID)
                             </label>
                             <input type="text" class="form-input" id="simpleStreamId" 
-                                   placeholder="مثال: camera001" oninput="updateSimpleUrls()">
-                            <div class="help-text">یک نام یکتا برای دوربین (فقط حروف انگلیسی و اعداد)</div>
+                                   placeholder="مثال: camera001" 
+                                   oninput="validateAndUpdateSimple(this)">
+                            <div class="help-text">فقط حروف انگلیسی (A-Z, a-z) و اعداد (0-9) مجاز است</div>
+                            <div class="validation-error" id="simpleStreamIdError" style="display: none;">
+                                فقط از حروف انگلیسی و اعداد استفاده کنید
+                            </div>
                         </div>
                         
                         <div class="form-group">
@@ -882,13 +1185,17 @@
                                 <i class="fas fa-lock"></i> رمز عبور (اختیاری)
                             </label>
                             <div class="password-input-group">
-                                <input type="password" class="form-input" id="simplePassword" 
-                                       placeholder="رمز عبور برای امنیت بیشتر" oninput="updateSimpleUrls()">
+                                <input type="text" class="form-input" id="simplePassword" 
+                                       placeholder="رمز عبور برای امنیت بیشتر" 
+                                       oninput="validateAndUpdateSimple(this)">
                                 <button type="button" class="password-toggle" onclick="togglePassword('simplePassword')">
                                     <i class="fas fa-eye"></i>
                                 </button>
                             </div>
-                            <div class="help-text">برای امنیت بیشتر، رمز عبور تعیین کنید</div>
+                            <div class="help-text">فقط حروف انگلیسی و اعداد مجاز است</div>
+                            <div class="validation-error" id="simplePasswordError" style="display: none;">
+                                فقط از حروف انگلیسی و اعداد استفاده کنید
+                            </div>
                         </div>
                         
                         <!-- Simple URL Display -->
@@ -936,23 +1243,57 @@
                         <div class="form-group">
                             <label class="form-label">شناسه استریم (Stream ID)</label>
                             <input type="text" class="form-input" id="advStreamId" 
-                                   placeholder="مثال: camera001" oninput="updateAdvancedUrls()">
+                                   placeholder="مثال: camera001" 
+                                   oninput="validateAndUpdateAdvanced(this)">
+                            <div class="help-text">فقط حروف انگلیسی (A-Z, a-z) و اعداد (0-9) مجاز است</div>
+                            <div class="validation-error" id="advStreamIdError" style="display: none;">
+                                فقط از حروف انگلیسی و اعداد استفاده کنید
+                            </div>
                         </div>
                         
                         <div class="form-group">
                             <label class="form-label">رمز عبور (اختیاری)</label>
                             <div class="password-input-group">
-                                <input type="password" class="form-input" id="advPassword" 
-                                       placeholder="رمز عبور برای امنیت بیشتر" oninput="updateAdvancedUrls()">
+                                <input type="text" class="form-input" id="advPassword" 
+                                       placeholder="رمز عبور برای امنیت بیشتر" 
+                                       oninput="validateAndUpdateAdvanced(this)">
                                 <button type="button" class="password-toggle" onclick="togglePassword('advPassword')">
                                     <i class="fas fa-eye"></i>
                                 </button>
+                            </div>
+                            <div class="validation-error" id="advPasswordError" style="display: none;">
+                                فقط از حروف انگلیسی و اعداد استفاده کنید
+                            </div>
+                        </div>
+
+                        <!-- Autostart/Reconnect Toggle -->
+                        <div class="toggle-group">
+                            <div class="toggle-label">
+                                <i class="fas fa-sync-alt toggle-icon"></i>
+                                <div class="toggle-label-text">
+                                    <span class="toggle-label-title">Autostart / Reconnect</span>
+                                    <span class="toggle-label-desc">شروع خودکار و اتصال مجدد (فقط برای Push)</span>
+                                </div>
+                            </div>
+                            <div class="toggle-switch" id="autostartToggle" onclick="toggleAutostart()">
+                            </div>
+                        </div>
+
+                        <!-- LAN Only Toggle -->
+                        <div class="toggle-group">
+                            <div class="toggle-label">
+                                <i class="fas fa-network-wired toggle-icon" style="color: var(--warning);"></i>
+                                <div class="toggle-label-text">
+                                    <span class="toggle-label-title">LAN Only</span>
+                                    <span class="toggle-label-desc">فقط اتصال در شبکه داخلی (محلی)</span>
+                                </div>
+                            </div>
+                            <div class="toggle-switch" id="lanonlyToggle" onclick="toggleLanOnly()">
                             </div>
                         </div>
                         
                         <div class="quick-params">
                             <div class="param-chip" onclick="toggleParam(this, '&cleanoutput')">Clean Output</div>
-                            <div class="param-chip" onclick="toggleParam(this, '&autostart')">Auto Start</div>
                             <div class="param-chip" onclick="toggleParam(this, '&muted')">Muted</div>
                             <div class="param-chip" onclick="toggleParam(this, '&novideo=0')">With Video</div>
                             <div class="param-chip" onclick="toggleParam(this, '&noaudio=0')">With Audio</div>
@@ -1056,19 +1397,20 @@
         let editingCameraId = null;
         let selectedParams = new Set();
         let currentMode = 'simple';
+        let autostartEnabled = true;
+        let lanonlyEnabled = false;
 
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             loadCameras();
             
-            // If no cameras exist, add default ones
             if (cameras.length === 0) {
                 addDefaultCameras();
             }
             
             renderCameras();
+            initializeMenu();
             
-            // Add event listeners
             document.querySelectorAll('input[name="urlType"]').forEach(radio => {
                 radio.addEventListener('change', (e) => {
                     document.getElementById('customUrlGroup').style.display = 
@@ -1076,8 +1418,7 @@
                 });
             });
             
-            // Set default selected params
-            const defaultParams = ['&cleanoutput', '&autostart', '&muted'];
+            const defaultParams = ['&cleanoutput', '&muted'];
             defaultParams.forEach(param => {
                 const chip = Array.from(document.querySelectorAll('.param-chip')).find(
                     c => c.getAttribute('onclick').includes(param)
@@ -1087,7 +1428,118 @@
                     selectedParams.add(param);
                 }
             });
+
+            const toggle = document.getElementById('autostartToggle');
+            if (toggle) {
+                toggle.classList.add('active');
+            }
+
+            // Update status indicator
+            updateStatusIndicator();
         });
+
+        // Initialize Menu
+        function initializeMenu() {
+            const menuToggle = document.getElementById('menuToggle');
+            const menuOverlay = document.getElementById('menuOverlay');
+            const menuPanel = document.getElementById('menuPanel');
+            
+            menuToggle.addEventListener('click', toggleMenu);
+            menuOverlay.addEventListener('click', closeMenu);
+        }
+
+        // Toggle Menu
+        function toggleMenu() {
+            const menuOverlay = document.getElementById('menuOverlay');
+            const menuPanel = document.getElementById('menuPanel');
+            const menuIcon = document.getElementById('menuIcon');
+            
+            const isOpen = menuPanel.classList.contains('active');
+            
+            if (isOpen) {
+                closeMenu();
+            } else {
+                menuOverlay.classList.add('active');
+                menuPanel.classList.add('active');
+                menuIcon.classList.remove('fa-bars');
+                menuIcon.classList.add('fa-times');
+            }
+        }
+
+        // Close Menu
+        function closeMenu() {
+            const menuOverlay = document.getElementById('menuOverlay');
+            const menuPanel = document.getElementById('menuPanel');
+            const menuIcon = document.getElementById('menuIcon');
+            
+            menuOverlay.classList.remove('active');
+            menuPanel.classList.remove('active');
+            menuIcon.classList.remove('fa-times');
+            menuIcon.classList.add('fa-bars');
+        }
+
+        // Update Status Indicator
+        function updateStatusIndicator() {
+            const indicator = document.getElementById('statusIndicator');
+            const activeCount = cameras.filter(c => c.active).length;
+            
+            if (activeCount > 0) {
+                indicator.classList.add('active');
+            } else {
+                indicator.classList.remove('active');
+            }
+        }
+
+        // Validate alphanumeric input
+        function validateAlphanumeric(value) {
+            return /^[a-zA-Z0-9]*$/.test(value);
+        }
+
+        // Validate and update simple mode
+        function validateAndUpdateSimple(input) {
+            const value = input.value;
+            const isStreamId = input.id === 'simpleStreamId';
+            const errorId = isStreamId ? 'simpleStreamIdError' : 'simplePasswordError';
+            
+            const cleanValue = value.replace(/[^a-zA-Z0-9]/g, '');
+            if (cleanValue !== value) {
+                input.value = cleanValue;
+            }
+            
+            const errorElement = document.getElementById(errorId);
+            if (value && !validateAlphanumeric(value)) {
+                input.classList.add('invalid');
+                errorElement.style.display = 'block';
+            } else {
+                input.classList.remove('invalid');
+                errorElement.style.display = 'none';
+            }
+            
+            updateSimpleUrls();
+        }
+
+        // Validate and update advanced mode
+        function validateAndUpdateAdvanced(input) {
+            const value = input.value;
+            const isStreamId = input.id === 'advStreamId';
+            const errorId = isStreamId ? 'advStreamIdError' : 'advPasswordError';
+            
+            const cleanValue = value.replace(/[^a-zA-Z0-9]/g, '');
+            if (cleanValue !== value) {
+                input.value = cleanValue;
+            }
+            
+            const errorElement = document.getElementById(errorId);
+            if (value && !validateAlphanumeric(value)) {
+                input.classList.add('invalid');
+                errorElement.style.display = 'block';
+            } else {
+                input.classList.remove('invalid');
+                errorElement.style.display = 'none';
+            }
+            
+            updateAdvancedUrls();
+        }
 
         // Add default cameras
         function addDefaultCameras() {
@@ -1095,21 +1547,21 @@
                 {
                     id: 1,
                     name: 'دوربین ورودی اصلی',
-                    streamId: 'entrance_main',
+                    streamId: 'entranceMain',
                     password: 'secure123',
-                    url: `${REMOTEVM_URL}?view=entrance_main&password=secure123&cleanoutput&autostart&muted`,
-                    pushUrl: `${REMOTEVM_URL}?push=entrance_main&password=secure123&autostart`,
-                    viewUrl: `${REMOTEVM_URL}?view=entrance_main&password=secure123&cleanoutput&autostart&muted`,
+                    url: `${REMOTEVM_URL}?view=entranceMain&password=secure123&cleanoutput&muted`,
+                    pushUrl: `${REMOTEVM_URL}?push=entranceMain&password=secure123&autostart&retry&webcam`,
+                    viewUrl: `${REMOTEVM_URL}?view=entranceMain&password=secure123&cleanoutput&muted`,
                     active: false
                 },
                 {
                     id: 2,
                     name: 'دوربین پارکینگ',
-                    streamId: 'parking_cam',
+                    streamId: 'parkingCam',
                     password: 'park456',
-                    url: `${REMOTEVM_URL}?view=parking_cam&password=park456&cleanoutput&autostart&muted`,
-                    pushUrl: `${REMOTEVM_URL}?push=parking_cam&password=park456&autostart`,
-                    viewUrl: `${REMOTEVM_URL}?view=parking_cam&password=park456&cleanoutput&autostart&muted`,
+                    url: `${REMOTEVM_URL}?view=parkingCam&password=park456&cleanoutput&muted`,
+                    pushUrl: `${REMOTEVM_URL}?push=parkingCam&password=park456&autostart&retry&webcam`,
+                    viewUrl: `${REMOTEVM_URL}?view=parkingCam&password=park456&cleanoutput&muted`,
                     active: false
                 },
                 {
@@ -1117,19 +1569,19 @@
                     name: 'دوربین انبار',
                     streamId: 'warehouse',
                     password: '',
-                    url: `${REMOTEVM_URL}?view=warehouse&cleanoutput&autostart&muted`,
-                    pushUrl: `${REMOTEVM_URL}?push=warehouse&autostart`,
-                    viewUrl: `${REMOTEVM_URL}?view=warehouse&cleanoutput&autostart&muted`,
+                    url: `${REMOTEVM_URL}?view=warehouse&cleanoutput&muted`,
+                    pushUrl: `${REMOTEVM_URL}?push=warehouse&autostart&retry&webcam`,
+                    viewUrl: `${REMOTEVM_URL}?view=warehouse&cleanoutput&muted`,
                     active: false
                 },
                 {
                     id: 4,
                     name: 'دوربین دفتر مدیریت',
-                    streamId: 'office_mgmt',
+                    streamId: 'officeMgmt',
                     password: 'admin789',
-                    url: `${REMOTEVM_URL}?view=office_mgmt&password=admin789&cleanoutput&autostart&muted`,
-                    pushUrl: `${REMOTEVM_URL}?push=office_mgmt&password=admin789&autostart`,
-                    viewUrl: `${REMOTEVM_URL}?view=office_mgmt&password=admin789&cleanoutput&autostart&muted`,
+                    url: `${REMOTEVM_URL}?view=officeMgmt&password=admin789&cleanoutput&muted`,
+                    pushUrl: `${REMOTEVM_URL}?push=officeMgmt&password=admin789&autostart&retry&webcam`,
+                    viewUrl: `${REMOTEVM_URL}?view=officeMgmt&password=admin789&cleanoutput&muted`,
                     active: false
                 }
             ];
@@ -1137,6 +1589,22 @@
             cameras = defaultCameras;
             cameraIdCounter = 4;
             saveCameras();
+        }
+
+        // Toggle Autostart/Reconnect
+        function toggleAutostart() {
+            const toggle = document.getElementById('autostartToggle');
+            toggle.classList.toggle('active');
+            autostartEnabled = toggle.classList.contains('active');
+            updateAdvancedUrls();
+        }
+
+        // Toggle LAN Only
+        function toggleLanOnly() {
+            const toggle = document.getElementById('lanonlyToggle');
+            toggle.classList.toggle('active');
+            lanonlyEnabled = toggle.classList.contains('active');
+            updateAdvancedUrls();
         }
 
         // Load cameras from localStorage
@@ -1157,15 +1625,12 @@
         function setMode(mode) {
             currentMode = mode;
             
-            // Update buttons
             document.getElementById('simpleModeBtn').classList.toggle('active', mode === 'simple');
             document.getElementById('advancedModeBtn').classList.toggle('active', mode === 'advanced');
             
-            // Show/hide content
             document.getElementById('simpleMode').style.display = mode === 'simple' ? 'block' : 'none';
             document.getElementById('advancedMode').style.display = mode === 'advanced' ? 'block' : 'none';
             
-            // Sync data between modes
             if (mode === 'advanced') {
                 document.getElementById('advCameraName').value = document.getElementById('simpleCameraName').value;
                 document.getElementById('advStreamId').value = document.getElementById('simpleStreamId').value;
@@ -1184,14 +1649,18 @@
             const streamId = document.getElementById('simpleStreamId').value;
             const password = document.getElementById('simplePassword').value;
             
-            if (!streamId) {
+            if (!streamId || !validateAlphanumeric(streamId)) {
+                document.getElementById('simpleUrlDisplay').style.display = 'none';
+                return;
+            }
+            
+            if (password && !validateAlphanumeric(password)) {
                 document.getElementById('simpleUrlDisplay').style.display = 'none';
                 return;
             }
             
             document.getElementById('simpleUrlDisplay').style.display = 'block';
             
-            // Build URLs
             let pushUrl = `${REMOTEVM_URL}?push=${streamId}`;
             let viewUrl = `${REMOTEVM_URL}?view=${streamId}`;
             
@@ -1200,8 +1669,8 @@
                 viewUrl += `&password=${password}`;
             }
             
-            pushUrl += '&autostart';
-            viewUrl += '&cleanoutput&autostart&muted';
+            pushUrl += '&autostart&retry&webcam';
+            viewUrl += '&cleanoutput&muted';
             
             document.getElementById('simplePushUrl').textContent = pushUrl;
             document.getElementById('simpleViewUrl').textContent = viewUrl;
@@ -1212,24 +1681,38 @@
             const streamId = document.getElementById('advStreamId').value;
             const password = document.getElementById('advPassword').value;
             
-            if (!streamId) {
+            if (!streamId || !validateAlphanumeric(streamId)) {
                 document.getElementById('advPushUrl').value = '';
                 document.getElementById('advViewUrl').value = '';
                 return;
             }
             
-            // Build Push URL
+            if (password && !validateAlphanumeric(password)) {
+                document.getElementById('advPushUrl').value = '';
+                document.getElementById('advViewUrl').value = '';
+                return;
+            }
+            
             let pushUrl = `${REMOTEVM_URL}?push=${streamId}`;
             if (password) pushUrl += `&password=${password}`;
-            if (selectedParams.has('&autostart')) pushUrl += '&autostart';
             
-            // Build View URL
+            if (autostartEnabled) {
+                pushUrl += '&autostart&retry&webcam';
+            }
+            
+            if (lanonlyEnabled) {
+                pushUrl += '&lanonly';
+            }
+            
             let viewUrl = `${REMOTEVM_URL}?view=${streamId}`;
             if (password) viewUrl += `&password=${password}`;
+            
+            if (lanonlyEnabled) {
+                viewUrl += '&lanonly';
+            }
+            
             selectedParams.forEach(param => {
-                if (param !== '&autostart' || param.includes('autostart')) {
-                    viewUrl += param;
-                }
+                viewUrl += param;
             });
             
             document.getElementById('advPushUrl').value = pushUrl;
@@ -1241,15 +1724,8 @@
             const input = document.getElementById(inputId);
             const icon = event.target.closest('.password-toggle').querySelector('i');
             
-            if (input.type === 'password') {
-                input.type = 'text';
-                icon.classList.remove('fa-eye');
-                icon.classList.add('fa-eye-slash');
-            } else {
-                input.type = 'password';
-                icon.classList.remove('fa-eye-slash');
-                icon.classList.add('fa-eye');
-            }
+            icon.classList.toggle('fa-eye');
+            icon.classList.toggle('fa-eye-slash');
         }
 
         // Toggle parameter chip
@@ -1287,6 +1763,8 @@
                 const cameraCard = createCameraCard(camera);
                 grid.appendChild(cameraCard);
             });
+            
+            updateStatusIndicator();
         }
 
         // Create camera card element
@@ -1296,12 +1774,13 @@
             card.id = `camera-${camera.id}`;
             
             const hasPassword = camera.password ? '🔒' : '';
+            const hasLanOnly = camera.url && camera.url.includes('lanonly') ? '🏠' : '';
             
             card.innerHTML = `
                 <div class="camera-header">
                     <div class="camera-name">
                         <span class="camera-status ${camera.active ? 'active' : ''}"></span>
-                        ${camera.name} ${hasPassword}
+                        ${camera.name} ${hasPassword} ${hasLanOnly}
                     </div>
                     <div class="camera-controls">
                         <button class="control-btn" onclick="showCameraLinks(${camera.id})" title="نمایش لینک‌ها">
@@ -1353,13 +1832,9 @@
             currentLayout = layout;
             const grid = document.getElementById('cameraGrid');
             
-            // Remove all layout classes
             grid.classList.remove('grid-1x1', 'grid-2x2', 'grid-3x3', 'grid-4x4');
-            
-            // Add new layout class
             grid.classList.add(`grid-${layout}`);
             
-            // Update active button
             document.querySelectorAll('.layout-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
@@ -1372,7 +1847,6 @@
             document.getElementById('modalTitle').textContent = 'افزودن دوربین جدید';
             document.getElementById('cameraId').value = '';
             
-            // Reset form
             document.getElementById('simpleCameraName').value = '';
             document.getElementById('simpleStreamId').value = '';
             document.getElementById('simplePassword').value = '';
@@ -1383,8 +1857,22 @@
             document.getElementById('advViewUrl').value = '';
             document.getElementById('customUrl').value = '';
             
-            // Reset to simple mode
+            document.querySelectorAll('.validation-error').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('.form-input').forEach(el => el.classList.remove('invalid'));
+            
             setMode('simple');
+            
+            autostartEnabled = true;
+            const autostartToggle = document.getElementById('autostartToggle');
+            if (autostartToggle) {
+                autostartToggle.classList.add('active');
+            }
+            
+            lanonlyEnabled = false;
+            const lanonlyToggle = document.getElementById('lanonlyToggle');
+            if (lanonlyToggle) {
+                lanonlyToggle.classList.remove('active');
+            }
             
             document.getElementById('simpleUrlDisplay').style.display = 'none';
             document.querySelector('input[name="urlType"][value="view"]').checked = true;
@@ -1401,19 +1889,30 @@
             document.getElementById('modalTitle').textContent = 'ویرایش دوربین';
             document.getElementById('cameraId').value = id;
             
-            // Fill simple mode
             document.getElementById('simpleCameraName').value = camera.name;
             document.getElementById('simpleStreamId').value = camera.streamId || '';
             document.getElementById('simplePassword').value = camera.password || '';
             
-            // Fill advanced mode
             document.getElementById('advCameraName').value = camera.name;
             document.getElementById('advStreamId').value = camera.streamId || '';
             document.getElementById('advPassword').value = camera.password || '';
             document.getElementById('advPushUrl').value = camera.pushUrl || '';
             document.getElementById('advViewUrl').value = camera.viewUrl || '';
             
-            // Set appropriate mode
+            const hasAutostart = camera.pushUrl && camera.pushUrl.includes('autostart');
+            autostartEnabled = hasAutostart;
+            const autostartToggle = document.getElementById('autostartToggle');
+            if (autostartToggle) {
+                autostartToggle.classList.toggle('active', hasAutostart);
+            }
+            
+            const hasLanOnly = camera.url && camera.url.includes('lanonly');
+            lanonlyEnabled = hasLanOnly;
+            const lanonlyToggle = document.getElementById('lanonlyToggle');
+            if (lanonlyToggle) {
+                lanonlyToggle.classList.toggle('active', hasLanOnly);
+            }
+            
             setMode('simple');
             updateSimpleUrls();
             
@@ -1436,7 +1935,11 @@
                 streamId = document.getElementById('simpleStreamId').value;
                 password = document.getElementById('simplePassword').value;
                 
-                // Build URLs
+                if (!validateAlphanumeric(streamId) || (password && !validateAlphanumeric(password))) {
+                    showNotification('شناسه استریم و رمز عبور فقط باید شامل حروف انگلیسی و اعداد باشد', 'warning');
+                    return;
+                }
+                
                 pushUrl = `${REMOTEVM_URL}?push=${streamId}`;
                 viewUrl = `${REMOTEVM_URL}?view=${streamId}`;
                 
@@ -1445,16 +1948,21 @@
                     viewUrl += `&password=${password}`;
                 }
                 
-                pushUrl += '&autostart';
-                viewUrl += '&cleanoutput&autostart&muted';
+                pushUrl += '&autostart&retry&webcam';
+                viewUrl += '&cleanoutput&muted';
                 
-                url = viewUrl; // Default to view URL
+                url = viewUrl;
             } else {
                 name = document.getElementById('advCameraName').value;
                 streamId = document.getElementById('advStreamId').value;
                 password = document.getElementById('advPassword').value;
                 pushUrl = document.getElementById('advPushUrl').value;
                 viewUrl = document.getElementById('advViewUrl').value;
+                
+                if (!validateAlphanumeric(streamId) || (password && !validateAlphanumeric(password))) {
+                    showNotification('شناسه استریم و رمز عبور فقط باید شامل حروف انگلیسی و اعداد باشد', 'warning');
+                    return;
+                }
                 
                 const urlType = document.querySelector('input[name="urlType"]:checked').value;
                 if (urlType === 'view') {
@@ -1472,7 +1980,6 @@
             }
             
             if (id) {
-                // Edit existing camera
                 const camera = cameras.find(c => c.id === parseInt(id));
                 if (camera) {
                     camera.name = name;
@@ -1483,7 +1990,6 @@
                     camera.viewUrl = viewUrl;
                 }
             } else {
-                // Add new camera
                 const newCamera = {
                     id: ++cameraIdCounter,
                     name: name,
@@ -1557,7 +2063,6 @@
             }
         }
 
-        // Show camera links
         function showCameraLinks(id) {
             const camera = cameras.find(c => c.id === id);
             if (!camera) return;
@@ -1597,7 +2102,6 @@
                 </div>
             `;
             
-            // Create and show modal
             const modal = document.createElement('div');
             modal.className = 'modal show';
             modal.style.cursor = 'pointer';
@@ -1606,7 +2110,6 @@
             document.body.appendChild(modal);
         }
 
-        // Test URLs
         function testCurrentUrls() {
             let pushUrl, viewUrl;
             
@@ -1622,7 +2125,6 @@
             if (viewUrl) setTimeout(() => window.open(viewUrl, '_blank'), 500);
         }
 
-        // Copy to clipboard
         function copyToClipboard(elementId, button) {
             let text;
             const element = document.getElementById(elementId);
@@ -1647,54 +2149,36 @@
                     button.innerHTML = originalHTML;
                     button.classList.remove('copied');
                 }, 2000);
-                
-                showNotification('لینک کپی شد', 'success');
-            }).catch(err => {
-                // Fallback
-                const textArea = document.createElement('textarea');
-                textArea.value = text;
-                document.body.appendChild(textArea);
-                textArea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textArea);
                 showNotification('لینک کپی شد', 'success');
             });
         }
 
-        // Notification System
-        function showNotification(message, type = 'info') {
+        function showNotification(message, type) {
             const notification = document.createElement('div');
             notification.className = 'notification';
-            notification.style.background = 
-                type === 'success' ? 'var(--success)' : 
-                type === 'warning' ? 'var(--warning)' : 
-                type === 'danger' ? 'var(--danger)' : 
-                type === 'info' ? 'var(--info)' : 'var(--primary-color)';
-            notification.textContent = message;
             
+            if (type === 'success') {
+                notification.style.background = 'var(--success)';
+            } else if (type === 'warning') {
+                notification.style.background = 'var(--warning)';
+            } else if (type === 'info') {
+                notification.style.background = 'var(--info)';
+            }
+            
+            notification.textContent = message;
             document.body.appendChild(notification);
             
             setTimeout(() => {
-                notification.style.animation = 'slideOut 0.3s ease';
+                notification.style.animation = 'slideOut 0.3s ease forwards';
                 setTimeout(() => {
-                    document.body.removeChild(notification);
+                    notification.remove();
                 }, 300);
             }, 3000);
         }
 
-        // Keyboard Shortcuts
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                document.querySelectorAll('.camera-card.fullscreen').forEach(card => {
-                    card.classList.remove('fullscreen');
-                });
-                closeModal();
-            }
-        });
-
-        // Add slideOut animation
-        const style = document.createElement('style');
-        style.textContent = `
+        // Keyframe for slide out animation
+        const styleSheet = document.createElement('style');
+        styleSheet.innerHTML = `
             @keyframes slideOut {
                 from {
                     transform: translateX(0);
@@ -1706,7 +2190,7 @@
                 }
             }
         `;
-        document.head.appendChild(style);
+        document.head.appendChild(styleSheet);
     </script>
 </body>
 </html>

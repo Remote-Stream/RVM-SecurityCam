@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>راهنمای RemoteVM Monitor - سیستم مانیتورینگ چند دوربین</title>
+    
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0a0e27;
+            --bg-secondary: #151932;
+            --bg-card: #1a1f3a;
+            --bg-hover: #242b4d;
+            --accent-blue: #00d4ff;
+            --accent-purple: #7c3aed;
+            --accent-green: #10b981;
+            --accent-orange: #f59e0b;
+            --accent-red: #ef4444;
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border-color: #2a3152;
+            --glow-blue: 0 0 30px rgba(0, 212, 255, 0.5);
+            --glow-purple: 0 0 30px rgba(124, 58, 237, 0.5);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes glow {
+            0% { box-shadow: 0 0 5px var(--accent-blue); }
+            50% { box-shadow: 0 0 20px var(--accent-blue), 0 0 30px var(--accent-blue); }
+            100% { box-shadow: 0 0 5px var(--accent-blue); }
+        }
+
+        @keyframes slideInLeft {
+            from { transform: translateX(-100px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes typing {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+
+        @keyframes blink {
+            50% { border-color: transparent; }
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(0, 212, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(124, 58, 237, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 20%, rgba(16, 185, 129, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 4rem 0;
+            position: relative;
+            animation: fadeIn 1s ease;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, var(--accent-blue) 0%, transparent 70%);
+            opacity: 0.1;
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        .header h1 {
+            font-size: 3.5rem;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+            position: relative;
+            display: inline-block;
+        }
+
+        .header .subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+
+        .version-badge {
+            display: inline-block;
+            padding: 0.5rem 1.5rem;
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            animation: glow 2s ease-in-out infinite;
+        }
+
+        /* Navigation */
+        .nav-section {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: 3rem 0;
+            flex-wrap: wrap;
+            animation: slideInLeft 1s ease 0.2s both;
+        }
+
+        .nav-item {
+            padding: 1rem 2rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .nav-item:hover::before {
+            left: 100%;
+        }
+
+        .nav-item:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-blue);
+            box-shadow: var(--glow-blue);
+        }
+
+        .nav-item i {
+            font-size: 1.5rem;
+            color: var(--accent-blue);
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Cards */
+        .section {
+            margin: 4rem 0;
+            animation: fadeIn 1s ease;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border-color);
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100px;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent-blue), transparent);
+        }
+
+        .section-title i {
+            font-size: 1.5rem;
+            color: var(--accent-blue);
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--accent-blue), var(--accent-purple));
+        }
+
+        .card:hover {
+            transform: translateX(10px);
+            border-color: var(--accent-blue);
+        }
+
+        .card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--accent-blue);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .card h3 i {
+            font-size: 1.25rem;
+        }
+
+        .card p {
+            color: var(--text-secondary);
+            line-height: 1.8;
+            margin-bottom: 1rem;
+        }
+
+        /* Step Cards */
+        .steps-container {
+            display: grid;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .step-card {
+            display: flex;
+            gap: 2rem;
+            padding: 2rem;
+            background: var(--bg-card);
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            position: relative;
+            animation: slideInRight 1s ease;
+        }
+
+        .step-number {
+            min-width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .step-content h4 {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .step-content p {
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        /* Code Block */
+        .code-block {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            position: relative;
+            overflow-x: auto;
+        }
+
+        .code-block::before {
+            content: 'CODE';
+            position: absolute;
+            top: 0.5rem;
+            right: 1rem;
+            font-size: 0.75rem;
+            color: var(--accent-blue);
+            opacity: 0.5;
+        }
+
+        .code-block code {
+            color: var(--accent-green);
+            font-family: 'Courier New', monospace;
+            font-size: 0.95rem;
+            display: block;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        /* Feature Grid */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .feature-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, var(--accent-blue) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .feature-card:hover::before {
+            opacity: 0.1;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--accent-blue);
+        }
+
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1rem;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+        }
+
+        .feature-card h4 {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .feature-card p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        /* Parameter Table */
+        .param-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        .param-table th,
+        .param-table td {
+            padding: 1rem;
+            text-align: right;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .param-table th {
+            background: var(--bg-secondary);
+            color: var(--accent-blue);
+            font-weight: 600;
+        }
+
+        .param-table tr:hover {
+            background: var(--bg-hover);
+        }
+
+        .param-table code {
+            background: var(--bg-primary);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            color: var(--accent-green);
+            font-family: monospace;
+        }
+
+        /* Alert Boxes */
+        .alert {
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 1rem 0;
+            position: relative;
+            padding-right: 3rem;
+        }
+
+        .alert::before {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            font-size: 1.25rem;
+        }
+
+        .alert-info {
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid var(--accent-blue);
+            color: var(--accent-blue);
+        }
+
+        .alert-info::before {
+            content: '\f05a';
+        }
+
+        .alert-success {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid var(--accent-green);
+            color: var(--accent-green);
+        }
+
+        .alert-success::before {
+            content: '\f00c';
+        }
+
+        .alert-warning {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid var(--accent-orange);
+            color: var(--accent-orange);
+        }
+
+        .alert-warning::before {
+            content: '\f071';
+        }
+
+        .alert-danger {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid var(--accent-red);
+            color: var(--accent-red);
+        }
+
+        .alert-danger::before {
+            content: '\f06a';
+        }
+
+        /* FAQ Section */
+        .faq-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+
+        .faq-question {
+            padding: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.3s;
+        }
+
+        .faq-question:hover {
+            background: var(--bg-hover);
+        }
+
+        .faq-question h4 {
+            color: var(--text-primary);
+            font-size: 1.1rem;
+            margin: 0;
+        }
+
+        .faq-question i {
+            color: var(--accent-blue);
+            transition: transform 0.3s;
+        }
+
+        .faq-item.active .faq-question i {
+            transform: rotate(180deg);
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .faq-item.active .faq-answer {
+            max-height: 500px;
+        }
+
+        .faq-answer-content {
+            padding: 0 1.5rem 1.5rem;
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        /* Back to Top Button */
+        .back-to-top {
+            position: fixed;
+            bottom: 2rem;
+            left: 2rem;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            z-index: 100;
+        }
+
+        .back-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .back-to-top:hover {
+            transform: scale(1.1);
+            box-shadow: var(--glow-blue);
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 3rem 0;
+            margin-top: 5rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .footer p {
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        .footer .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .footer .social-links a {
+            width: 40px;
+            height: 40px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            transition: all 0.3s;
+        }
+
+        .footer .social-links a:hover {
+            border-color: var(--accent-blue);
+            color: var(--accent-blue);
+            transform: translateY(-5px);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.5rem;
+            }
+
+            .nav-section {
+                gap: 1rem;
+            }
+
+            .step-card {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .param-table {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1>راهنمای RemoteVM Monitor</h1>
+            <p class="subtitle">سیستم حرفه‌ای مانیتورینگ چند دوربین</p>
+            <span class="version-badge">نسخه 2.0 Pro</span>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="nav-section">
+            <div class="nav-item" onclick="scrollToSection('getting-started')">
+                <i class="fas fa-rocket"></i>
+                <span>شروع سریع</span>
+            </div>
+            <div class="nav-item" onclick="scrollToSection('features')">
+                <i class="fas fa-star"></i>
+                <span>امکانات</span>
+            </div>
+            <div class="nav-item" onclick="scrollToSection('parameters')">
+                <i class="fas fa-cog"></i>
+                <span>پارامترها</span>
+            </div>
+            <div class="nav-item" onclick="scrollToSection('security')">
+                <i class="fas fa-shield-alt"></i>
+                <span>امنیت</span>
+            </div>
+            <div class="nav-item" onclick="scrollToSection('faq')">
+                <i class="fas fa-question-circle"></i>
+                <span>سوالات متداول</span>
+            </div>
+        </nav>
+
+        <!-- Getting Started Section -->
+        <section class="section" id="getting-started">
+            <h2 class="section-title">
+                <i class="fas fa-play-circle"></i>
+                شروع کار با RemoteVM Monitor
+            </h2>
+
+            <div class="alert alert-info">
+                <strong>نکته:</strong> این سیستم بر پایه VDO.Ninja (RemoteVM) کار می‌کند و نیازی به نصب نرم‌افزار ندارد.
+            </div>
+
+            <div class="steps-container">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>افزودن دوربین جدید</h4>
+                        <p>روی دکمه "افزودن دوربین" کلیک کنید و اطلاعات زیر را وارد نمایید:</p>
+                        <ul style="margin-top: 1rem; padding-right: 1.5rem; color: var(--text-secondary);">
+                            <li>نام دوربین (برای شناسایی)</li>
+                            <li>Stream ID (فقط حروف انگلیسی و اعداد)</li>
+                            <li>رمز عبور (اختیاری برای امنیت بیشتر)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>دریافت لینک‌ها</h4>
+                        <p>پس از وارد کردن اطلاعات، دو لینک برای شما ساخته می‌شود:</p>
+                        <div class="code-block">
+                            <code>Push URL: برای ارسال تصویر از دوربین
+View URL: برای مشاهده تصویر دوربین</code>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>فعال‌سازی دوربین</h4>
+                        <p>برای مشاهده تصویر دوربین، روی دکمه "فعال‌سازی" در کارت دوربین کلیک کنید.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="section" id="features">
+            <h2 class="section-title">
+                <i class="fas fa-sparkles"></i>
+                امکانات کلیدی
+            </h2>
+
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-th"></i>
+                    </div>
+                    <h4>نمایش چندگانه</h4>
+                    <p>قابلیت نمایش 1، 4، 9 یا 16 دوربین به صورت همزمان در یک صفحه</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-expand"></i>
+                    </div>
+                    <h4>حالت تمام صفحه</h4>
+                    <p>مشاهده هر دوربین در حالت تمام صفحه با یک کلیک</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <h4>امنیت بالا</h4>
+                    <p>پشتیبانی از رمز عبور برای هر دوربین جهت جلوگیری از دسترسی غیرمجاز</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-network-wired"></i>
+                    </div>
+                    <h4>LAN Only</h4>
+                    <p>امکان محدود کردن دسترسی فقط به شبکه داخلی</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-sync-alt"></i>
+                    </div>
+                    <h4>اتصال خودکار</h4>
+                    <p>اتصال مجدد خودکار در صورت قطع ارتباط</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-save"></i>
+                    </div>
+                    <h4>ذخیره‌سازی</h4>
+                    <p>ذخیره تنظیمات و لیست دوربین‌ها در مرورگر</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Parameters Section -->
+        <section class="section" id="parameters">
+            <h2 class="section-title">
+                <i class="fas fa-sliders-h"></i>
+                پارامترهای پیشرفته
+            </h2>
+
+            <div class="card">
+                <h3><i class="fas fa-list"></i> پارامترهای رایج</h3>
+                <table class="param-table">
+                    <thead>
+                        <tr>
+                            <th>پارامتر</th>
+                            <th>توضیحات</th>
+                            <th>کاربرد</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>&autostart</code></td>
+                            <td>شروع خودکار استریم</td>
+                            <td>فقط در Push URL</td>
+                        </tr>
+                        <tr>
+                            <td><code>&retry</code></td>
+                            <td>تلاش مجدد در صورت قطعی</td>
+                            <td>فقط در Push URL</td>
+                        </tr>
+                        <tr>
+                            <td><code>&webcam</code></td>
+                            <td>استفاده از وبکم</td>
+                            <td>فقط در Push URL</td>
+                        </tr>
+                        <tr>
+                            <td><code>&cleanoutput</code></td>
+                            <td>حذف UI اضافی</td>
+                            <td>View URL</td>
+                        </tr>
+                        <tr>
+                            <td><code>&muted</code></td>
+                            <td>بی‌صدا به صورت پیش‌فرض</td>
+                            <td>View URL</td>
+                        </tr>
+                        <tr>
+                            <td><code>&lanonly</code></td>
+                            <td>فقط شبکه داخلی</td>
+                            <td>هر دو URL</td>
+                        </tr>
+                        <tr>
+                            <td><code>&bitrate=5000</code></td>
+                            <td>کیفیت بالا</td>
+                            <td>View URL</td>
+                        </tr>
+                        <tr>
+                            <td><code>&framerate=30</code></td>
+                            <td>30 فریم بر ثانیه</td>
+                            <td>View URL</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="alert alert-warning">
+                <strong>توجه:</strong> استفاده از پارامترهای اشتباه ممکن است باعث عدم کارکرد صحیح دوربین شود.
+            </div>
+        </section>
+
+        <!-- Security Section -->
+        <section class="section" id="security">
+            <h2 class="section-title">
+                <i class="fas fa-shield-alt"></i>
+                نکات امنیتی
+            </h2>
+
+            <div class="card">
+                <h3><i class="fas fa-key"></i> استفاده از رمز عبور</h3>
+                <p>برای جلوگیری از دسترسی غیرمجاز به دوربین‌های خود، حتماً از رمز عبور استفاده کنید. رمز عبور باید:</p>
+                <ul style="margin-top: 1rem; padding-right: 1.5rem; color: var(--text-secondary); line-height: 2;">
+                    <li>حداقل 8 کاراکتر داشته باشد</li>
+                    <li>ترکیبی از حروف و اعداد باشد</li>
+                    <li>برای هر دوربین منحصر به فرد باشد</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h3><i class="fas fa-network-wired"></i> استفاده از LAN Only</h3>
+                <p>اگر دوربین‌های شما فقط در شبکه داخلی استفاده می‌شوند، گزینه LAN Only را فعال کنید تا از دسترسی اینترنتی جلوگیری شود.</p>
+            </div>
+
+            <div class="card">
+                <h3><i class="fas fa-user-secret"></i> Stream ID امن</h3>
+                <p>از Stream ID های قابل حدس مانند "camera1" یا "test" استفاده نکنید. از ترکیب‌های پیچیده و تصادفی استفاده کنید.</p>
+                <div class="code-block">
+                    <code>مثال خوب: xK9mP2nQ7
+مثال بد: camera1</code>
+                </div>
+            </div>
+
+            <div class="alert alert-danger">
+                <strong>هشدار امنیتی:</strong> هرگز لینک‌های Push خود را در مکان‌های عمومی به اشتراک نگذارید.
+            </div>
+        </section>
+
+        <!-- FAQ Section -->
+        <section class="section" id="faq">
+            <h2 class="section-title">
+                <i class="fas fa-question-circle"></i>
+                سوالات متداول
+            </h2>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    <h4>چرا تصویر دوربین نمایش داده نمی‌شود؟</h4>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <div class="faq-answer-content">
+                        ممکن است به دلایل زیر باشد:
+                        <br>• دوربین فعال نشده است (روی دکمه فعال‌سازی کلیک کنید)
+                        <br>• Stream ID در فرستنده و گیرنده یکسان نیست
+                        <br>• مرورگر اجازه دسترسی به دوربین را نداده است
+                        <br>• اتصال اینترنت قطع یا ضعیف است
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    <h4>آیا می‌توانم بیش از 16 دوربین اضافه کنم؟</h4>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <div class="faq-answer-content">
+                        بله، محدودیتی در تعداد دوربین‌های قابل اضافه کردن وجود ندارد. اما نمایش همزمان حداکثر 16 دوربین پشتیبانی می‌شود. می‌توانید دوربین‌های بیشتری اضافه کنید و آنها را به صورت انتخابی فعال/غیرفعال کنید.
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    <h4>چگونه می‌توانم ویدیو را ضبط کنم؟</h4>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <div class="faq-answer-content">
+                        در حال حاضر قابلیت ضبط مستقیم در این نسخه وجود ندارد. برای ضبط می‌توانید از نرم‌افزارهای ضبط صفحه مانند OBS Studio یا ابزارهای مشابه استفاده کنید.
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    <h4>آیا اطلاعات من ذخیره می‌شود؟</h4>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <div class="faq-answer-content">
+                        تمام اطلاعات فقط در مرورگر شما (LocalStorage) ذخیره می‌شود و به هیچ سرور خارجی ارسال نمی‌گردد. ارتباط ویدیو نیز به صورت P2P و رمزنگاری شده است.
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    <h4>چه مرورگرهایی پشتیبانی می‌شوند؟</h4>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <div class="faq-answer-content">
+                        مرورگرهای مدرن زیر پشتیبانی می‌شوند:
+                        <br>• Google Chrome (نسخه 80+)
+                        <br>• Mozilla Firefox (نسخه 75+)
+                        <br>• Microsoft Edge (نسخه 80+)
+                        <br>• Safari (نسخه 14+)
+                        <br><br>
+                        برای بهترین عملکرد، استفاده از Chrome توصیه می‌شود.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tips Section -->
+        <section class="section">
+            <h2 class="section-title">
+                <i class="fas fa-lightbulb"></i>
+                نکات و ترفندها
+            </h2>
+
+            <div class="card">
+                <h3><i class="fas fa-keyboard"></i> میانبرهای کیبورد</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem;">
+                    <div style="background: var(--bg-primary); padding: 1rem; border-radius: 8px;">
+                        <code style="color: var(--accent-blue);">ESC</code>
+                        <p style="color: var(--text-secondary); margin-top: 0.5rem; font-size: 0.9rem;">خروج از حالت تمام صفحه</p>
+                    </div>
+                    <div style="background: var(--bg-primary); padding: 1rem; border-radius: 8px;">
+                        <code style="color: var(--accent-blue);">Ctrl + N</code>
+                        <p style="color: var(--text-secondary); margin-top: 0.5rem; font-size: 0.9rem;">افزودن دوربین جدید</p>
+                    </div>
+                    <div style="background: var(--bg-primary); padding: 1rem; border-radius: 8px;">
+                        <code style="color: var(--accent-blue);">Ctrl + S</code>
+                        <p style="color: var(--text-secondary); margin-top: 0.5rem; font-size: 0.9rem;">ذخیره تنظیمات</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="alert alert-success">
+                <strong>نکته حرفه‌ای:</strong> برای بهترین کیفیت، از کابل LAN به جای WiFi استفاده کنید و bitrate را روی 5000 تنظیم نمایید.
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>© 2024 RemoteVM Monitor - تمامی حقوق محفوظ است</p>
+            <p>Powered by VDO.Ninja Technology</p>
+            <div class="social-links">
+                <a href="#" title="GitHub">
+                    <i class="fab fa-github"></i>
+                </a>
+                <a href="#" title="Telegram">
+                    <i class="fab fa-telegram"></i>
+                </a>
+                <a href="#" title="Email">
+                    <i class="fas fa-envelope"></i>
+                </a>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Back to Top Button -->
+    <div class="back-to-top" id="backToTop" onclick="scrollToTop()">
+        <i class="fas fa-arrow-up"></i>
+    </div>
+
+    <script>
+        // Toggle FAQ items
+        function toggleFaq(element) {
+            const faqItem = element.parentElement;
+            faqItem.classList.toggle('active');
+        }
+
+        // Scroll to section
+        function scrollToSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            if (section) {
+                section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        // Scroll to top
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Show/hide back to top button
+        window.addEventListener('scroll', () => {
+            const backToTop = document.getElementById('backToTop');
+            if (window.scrollY > 500) {
+                backToTop.classList.add('visible');
+            } else {
+                backToTop.classList.remove('visible');
+            }
+        });
+
+        // Add animation on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Observe all cards and sections
+        document.querySelectorAll('.card, .step-card, .feature-card').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(el);
+        });
+
+        // Typing effect for header
+        const headerTitle = document.querySelector('.header h1');
+        if (headerTitle) {
+            const text = headerTitle.textContent;
+            headerTitle.textContent = '';
+            let index = 0;
+            
+            function typeWriter() {
+                if (index < text.length) {
+                    headerTitle.textContent += text.charAt(index);
+                    index++;
+                    setTimeout(typeWriter, 50);
+                }
+            }
+            
+            setTimeout(typeWriter, 500);
+        }
+
+        // Add particles effect
+        function createParticle() {
+            const particle = document.createElement('div');
+            particle.style.cssText = `
+                position: fixed;
+                width: 2px;
+                height: 2px;
+                background: var(--accent-blue);
+                border-radius: 50%;
+                pointer-events: none;
+                opacity: 0.5;
+                z-index: 0;
+            `;
+            
+            const startX = Math.random() * window.innerWidth;
+            const startY = window.innerHeight + 10;
+            
+            particle.style.left = startX + 'px';
+            particle.style.top = startY + 'px';
+            
+            document.body.appendChild(particle);
+            
+            const duration = 3000 + Math.random() * 3000;
+            const endY = -10;
+            
+            particle.animate([
+                { transform: `translate(0, 0)`, opacity: 0.5 },
+                { transform: `translate(${Math.random() * 100 - 50}px, ${endY - startY}px)`, opacity: 0 }
+            ], {
+                duration: duration,
+                easing: 'linear'
+            }).onfinish = () => particle.remove();
+        }
+
+        // Create particles periodically
+        setInterval(createParticle, 300);
+    </script>
+</body>
+</html>
